@@ -46,14 +46,15 @@ public class Task4 {
     public void start() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("=========================================");
-        System.out.println("    TASK 4: CURRENCY CONVERTER");
+        System.out.println("        TASK 4: CURRENCY CONVERTER");
         System.out.println("=========================================");
+        System.out.println("Convert between supported currencies with a clean command-line experience.");
 
         while (true) {
             displaySupportedCurrencies();
 
-            String sourceCurrency = getValidCurrencyCode(scanner, "Select SOURCE (From) currency code: ");
-            String targetCurrency = getValidCurrencyCode(scanner, "Select TARGET (To) currency code: ");
+            String sourceCurrency = getValidCurrencyCode(scanner, "Source currency code: ");
+            String targetCurrency = getValidCurrencyCode(scanner, "Target currency code: ");
             BigDecimal amount = getValidAmount(scanner);
 
             try {
@@ -61,58 +62,76 @@ public class Task4 {
                 String srcSymbol = currencySymbols.get(sourceCurrency);
                 String tgtSymbol = currencySymbols.get(targetCurrency);
 
-                System.out.println("\n-----------------------------------------");
-                System.out.printf(" %s%,.2f (%s) => %s%,.2f (%s)\n", srcSymbol, amount, sourceCurrency, tgtSymbol, result, targetCurrency);
-                System.out.println("-----------------------------------------");
+                System.out.println("\n=========================================");
+                System.out.printf(" %s%,.2f %s = %s%,.2f %s\n", srcSymbol, amount, sourceCurrency, tgtSymbol, result, targetCurrency);
+                System.out.println("=========================================");
 
             } catch (Exception e) {
                 System.out.println("[ERROR] " + e.getMessage());
             }
 
-            System.out.print("\nPerform another conversion? (yes/no): ");
-            String choice = scanner.next().trim().toLowerCase();
-            if (!choice.startsWith("y")) {
+            if (!askToContinue(scanner)) {
                 break;
             }
         }
 
-        System.out.println("\nGoodbye.");
+        System.out.println("\nThank you for using Task4 Currency Converter. Goodbye.");
         scanner.close();
     }
 
     private void displaySupportedCurrencies() {
         System.out.println("\nSupported Currencies:");
+        System.out.println("-----------------------------------------");
+        System.out.printf(" %-5s %-7s %-10s\n", "Code", "Symbol", "Rate to USD");
+        System.out.println("-----------------------------------------");
         for (String code : exchangeRatesToUsd.keySet()) {
-            System.out.printf(" • %s (%s)\n", code, currencySymbols.get(code));
+            System.out.printf(" %-5s %-7s %-10s\n", code, currencySymbols.get(code), exchangeRatesToUsd.get(code).toPlainString());
         }
-        System.out.println();
+        System.out.println("-----------------------------------------");
     }
 
     private String getValidCurrencyCode(Scanner scanner, String prompt) {
         while (true) {
             System.out.print(prompt);
-            String input = scanner.next().trim().toUpperCase();
+            String input = scanner.nextLine().trim().toUpperCase();
             if (exchangeRatesToUsd.containsKey(input)) {
                 return input;
             }
-            System.out.println("[INVALID] Currency code not supported.");
+            System.out.println("[INVALID] Currency code not supported. Please enter one of the listed codes.");
         }
     }
 
     private java.math.BigDecimal getValidAmount(Scanner scanner) {
         while (true) {
-            System.out.print("Enter the amount to convert: ");
+            System.out.print("Amount to convert: ");
+            String input = scanner.nextLine().trim();
             try {
-                java.math.BigDecimal amount = scanner.nextBigDecimal();
+                java.math.BigDecimal amount = new java.math.BigDecimal(input);
                 if (amount.compareTo(java.math.BigDecimal.ZERO) < 0) {
                     System.out.println("[INVALID] Amount cannot be negative.");
                     continue;
                 }
                 return amount;
-            } catch (Exception e) {
-                System.out.println("[INVALID] Please enter a valid decimal number.");
-                scanner.next();
+            } catch (NumberFormatException e) {
+                System.out.println("[INVALID] Please enter a valid decimal number, e.g. 125.50");
             }
+        }
+    }
+
+    private boolean askToContinue(Scanner scanner) {
+        while (true) {
+            System.out.print("\nConvert another amount? (Y/N): ");
+            String input = scanner.nextLine().trim().toLowerCase();
+            if (input.isEmpty()) {
+                continue;
+            }
+            if (input.startsWith("y")) {
+                return true;
+            }
+            if (input.startsWith("n")) {
+                return false;
+            }
+            System.out.println("Please answer Y or N.");
         }
     }
 
