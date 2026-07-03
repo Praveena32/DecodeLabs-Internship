@@ -133,7 +133,7 @@ class ATM {
 // ==========================================
 // 3. TASK4 CLASS (Application Entry Point)
 // ==========================================
-public class Task4 {
+public class Task3 {
     public static void main(String[] args) {
         // Create the account with a $500 starting balance
         BankAccount userAccount = new BankAccount("NL-987654321", 500.00);
